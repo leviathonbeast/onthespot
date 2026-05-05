@@ -6,6 +6,7 @@ import tracemalloc
 from functools import wraps
 from logging.handlers import RotatingFileHandler
 from threading import Lock
+from typing import Any
 
 from .otsconfig import config
 
@@ -17,16 +18,16 @@ log_handler = RotatingFileHandler(config.get("_log_file"),
                                   maxBytes=(5 * 1024 * 1024),
                                   backupCount=2,
                                   encoding='utf-8',
-                                  delay=0)
+                                  delay=False)
 stdout_handler = logging.StreamHandler(sys.stdout)
 log_handler.setFormatter(log_formatter)
 stdout_handler.setFormatter(log_formatter)
 
-account_pool = []
-temp_download_path = []
-parsing = {}
-pending = {}
-download_queue = {}
+account_pool: list[Any] = []
+temp_download_path: list[str] = []
+parsing: dict[str, Any] = {}
+pending: dict[str, Any] = {}
+download_queue: dict[str, Any] = {}
 parsing_lock = Lock()
 pending_lock = Lock()
 download_queue_lock = Lock()
