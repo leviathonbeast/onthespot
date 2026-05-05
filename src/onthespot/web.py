@@ -1,4 +1,5 @@
 import os
+
 # Required for librespot-python
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 import argparse
@@ -9,23 +10,25 @@ import sys
 import threading
 import time
 import traceback
-from flask import Flask, jsonify, render_template, redirect, request, send_file, url_for, flash, Response
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
+from flask import Flask, Response, flash, jsonify, redirect, render_template, request, send_file, url_for
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+
 from .accounts import FillAccountPool, get_account_token
-from .api.apple_music import apple_music_get_track_metadata, apple_music_add_account
-from .api.bandcamp import bandcamp_get_track_metadata
-from .api.deezer import deezer_get_track_metadata, deezer_add_account
-from .api.qobuz import qobuz_get_track_metadata, qobuz_add_account
-from .api.soundcloud import soundcloud_get_track_metadata, soundcloud_add_account
-from .api.spotify import MirrorSpotifyPlayback, spotify_new_session, spotify_get_track_metadata, spotify_get_podcast_episode_metadata
-from .api.tidal import tidal_get_track_metadata
-from .api.youtube_music import youtube_music_get_track_metadata, youtube_music_add_account
-from .api.crunchyroll import crunchyroll_get_episode_metadata, crunchyroll_add_account
+from .api.apple_music import apple_music_add_account
+from .api.crunchyroll import crunchyroll_add_account
+from .api.deezer import deezer_add_account
 from .api.generic import generic_add_account
+from .api.qobuz import qobuz_add_account
+from .api.soundcloud import soundcloud_add_account
+from .api.spotify import (
+    MirrorSpotifyPlayback,
+)
+from .api.youtube_music import youtube_music_add_account
 from .downloader import DownloadWorker, RetryWorker
-from .otsconfig import cache_dir, config_dir, config
-from .parse_item import parsingworker, parse_url
-from .runtimedata import get_logger, account_pool, pending, download_queue, download_queue_lock, pending_lock
+from .otsconfig import cache_dir, config, config_dir
+from .parse_item import parse_url, parsingworker
+from .runtimedata import account_pool, download_queue, download_queue_lock, get_logger, pending, pending_lock
 from .search import get_search_results
 from .utils import format_bytes
 
@@ -131,7 +134,7 @@ def index():
 @login_required
 def search():
     config_path = os.path.join(config_dir(), 'otsconfig.json')
-    with open(config_path, 'r') as config_file:
+    with open(config_path) as config_file:
         config_data = json.load(config_file)
     return render_template('search.html', config=config_data)
 
@@ -140,7 +143,7 @@ def search():
 @login_required
 def download_queue_page():
     config_path = os.path.join(config_dir(), 'otsconfig.json')
-    with open(config_path, 'r') as config_file:
+    with open(config_path) as config_file:
         config_data = json.load(config_file)
     return render_template('download_queue.html', config=config_data)
 
@@ -149,7 +152,7 @@ def download_queue_page():
 @login_required
 def settings():
     config_path = os.path.join(config_dir(), 'otsconfig.json')
-    with open(config_path, 'r') as config_file:
+    with open(config_path) as config_file:
         config_data = json.load(config_file)
     return render_template('settings.html', config=config_data, account_pool=account_pool)
 

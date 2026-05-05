@@ -1,15 +1,18 @@
 import os
+
 # Required for librespot-python
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 import sys
 import threading
+
 from PyQt6.QtCore import QTranslator
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QStyle
-from .qt.mainui import MainWindow
-from .qt.minidialog import MiniDialog
+from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
+
 from .otsconfig import config
 from .parse_item import parsingworker
+from .qt.mainui import MainWindow
+from .qt.minidialog import MiniDialog
 from .runtimedata import get_logger, set_init_tray
 
 logger = get_logger('gui')

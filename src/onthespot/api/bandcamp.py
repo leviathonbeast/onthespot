@@ -1,9 +1,11 @@
-from html import unescape
 import json
 import re
+from html import unescape
+
 import requests
+
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
+from ..runtimedata import account_pool, get_logger
 from ..utils import conv_list_format, make_call
 
 logger = get_logger("api.bandcamp")

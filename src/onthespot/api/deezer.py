@@ -2,13 +2,15 @@ import html.parser
 import json
 import random
 import re
-import requests
 import uuid
 from binascii import a2b_hex, b2a_hex
+
+import requests
 from Cryptodome.Cipher import AES, Blowfish
 from Cryptodome.Hash import MD5
+
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
+from ..runtimedata import account_pool, get_logger
 from ..utils import conv_list_format, make_call
 
 logger = get_logger("api.deezer")
@@ -236,7 +238,7 @@ def deezer_login_user(account):
     try:
         if uuid == 'public_deezer':
             # I have no idea why rentry 403s every scraping trick I've tried
-            ia_url = f"http://archive.org/wayback/available?url=https://rentry.co/firehawk52"
+            ia_url = "http://archive.org/wayback/available?url=https://rentry.co/firehawk52"
             response = requests.get(ia_url)
             if response.status_code != 200:
                 logger.error(f'Unable to fetch public deezer account from Internet Archive, status code: {response.raise_for_status()}')

@@ -24,7 +24,7 @@ call venvwin\Scripts\activate.bat
 
 echo =^> Installing dependencies via pip...
 python -m pip install --upgrade pip wheel pyinstaller
-pip install -r requirements.txt
+pip install .
 
 
 echo =^> Downloading FFmpeg binary...

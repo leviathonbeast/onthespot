@@ -210,7 +210,7 @@ class Config:
         }
         # Load Config
         if os.path.isfile(self.__cfg_path):
-            self.__config = json.load(open(cfg_path, "r"))
+            self.__config = json.load(open(cfg_path))
         else:
             try:
                 os.makedirs(os.path.dirname(self.__cfg_path), exist_ok=True)
@@ -318,9 +318,9 @@ class Config:
 
             # Migration (>v1.0.4)
             if self.get('theme') == 'dark':
-                self.set('theme', f'background-color: #282828; color: white;')
+                self.set('theme', 'background-color: #282828; color: white;')
             elif self.get('theme') == 'light':
-                self.set('theme', f'background-color: white; color: black;')
+                self.set('theme', 'background-color: white; color: black;')
 
             # Migration (>v1.0.5)
             cfg_copy = self.get('accounts').copy()

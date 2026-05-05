@@ -1,8 +1,10 @@
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from PyQt6.QtWidgets import QLabel, QHBoxLayout, QWidget
+from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+
 from ..otsconfig import config
+
 
 class LabelWithThumb(QWidget):
     def __init__(self, label, thumb_url):

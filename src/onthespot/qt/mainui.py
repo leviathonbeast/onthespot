@@ -3,30 +3,58 @@ import shutil
 import threading
 import time
 import traceback
-from urllib3.exceptions import MaxRetryError, NewConnectionError
-from PyQt6 import uic, QtGui
-from PyQt6.QtCore import QThread, QDir, Qt, pyqtSignal, QObject, QTimer
-from PyQt6.QtGui import QIcon, QColor
-from PyQt6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QPushButton, QProgressBar, QTableWidgetItem, QFileDialog, QRadioButton, QHBoxLayout, QWidget, QColorDialog
-from ..accounts import get_account_token, FillAccountPool
-from ..api.apple_music import apple_music_add_account, apple_music_get_track_metadata
-from ..api.bandcamp import bandcamp_add_account, bandcamp_get_track_metadata
-from ..api.deezer import deezer_add_account, deezer_get_track_metadata
-from ..api.qobuz import qobuz_add_account, qobuz_get_track_metadata
-from ..api.soundcloud import soundcloud_add_account, soundcloud_get_token, soundcloud_get_track_metadata
-from ..api.spotify import MirrorSpotifyPlayback, spotify_get_token, spotify_get_track_metadata, spotify_get_podcast_episode_metadata, spotify_new_session
-from ..api.tidal import tidal_add_account_pt1, tidal_add_account_pt2, tidal_get_track_metadata
-from ..api.youtube_music import youtube_music_add_account, youtube_music_get_track_metadata
-from ..api.generic import generic_add_account, generic_get_track_metadata, generic_list_extractors
-from ..api.crunchyroll import crunchyroll_add_account, crunchyroll_get_episode_metadata
+
+from PyQt6 import uic
+from PyQt6.QtCore import QDir, QObject, Qt, pyqtSignal
+from PyQt6.QtGui import QColor, QIcon
+from PyQt6.QtWidgets import (
+    QApplication,
+    QColorDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QTableWidgetItem,
+    QWidget,
+)
+
+from ..accounts import FillAccountPool, get_account_token
+from ..api.apple_music import apple_music_add_account
+from ..api.bandcamp import bandcamp_add_account
+from ..api.crunchyroll import crunchyroll_add_account
+from ..api.deezer import deezer_add_account
+from ..api.generic import generic_add_account, generic_list_extractors
+from ..api.qobuz import qobuz_add_account
+from ..api.soundcloud import soundcloud_add_account
+from ..api.spotify import (
+    MirrorSpotifyPlayback,
+    spotify_new_session,
+)
+from ..api.tidal import tidal_add_account_pt1, tidal_add_account_pt2
+from ..api.youtube_music import youtube_music_add_account
 from ..downloader import DownloadWorker, RetryWorker
-from ..otsconfig import config, cache_dir
-from ..runtimedata import account_pool, download_queue, download_queue_lock, get_init_tray, parsing, parsing_lock, pending, pending_lock, get_logger, temp_download_path
+from ..otsconfig import cache_dir, config
+from ..runtimedata import (
+    account_pool,
+    download_queue,
+    download_queue_lock,
+    get_init_tray,
+    get_logger,
+    parsing,
+    parsing_lock,
+    pending,
+    pending_lock,
+    temp_download_path,
+)
+from ..search import get_search_results
+from ..utils import format_bytes, is_latest_release, open_item
 from .dl_progressbtn import DownloadActionsButtons
 from .settings import load_config, save_config
 from .thumb_listitem import LabelWithThumb
-from ..utils import is_latest_release, open_item, format_bytes
-from ..search import get_search_results
 
 logger = get_logger('gui.main_ui')
 
@@ -82,7 +110,7 @@ class MainWindow(QMainWindow):
 
 
     def __init__(self, _dialog, start_url=''):
-        super(MainWindow, self).__init__()
+        super().__init__()
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.icon_cache = {}
         QApplication.setStyle("fusion")

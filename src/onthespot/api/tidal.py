@@ -1,11 +1,12 @@
-from base64 import b64decode
-import json
-import requests
 import time
 import uuid
+from base64 import b64decode
+
+import requests
+
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
-from ..utils import make_call, conv_list_format
+from ..runtimedata import account_pool, get_logger
+from ..utils import conv_list_format, make_call
 
 logger = get_logger("api.tidal")
 CLIENT_ID = b64decode("N203QXAwSkM5ajFjT00zbg==").decode("iso-8859-1")
@@ -424,7 +425,7 @@ def tidal_get_mix_data(token, mix_id):
     params["locale"] = 'en_US'
     params["deviceType"] = 'BROWSER'
 
-    mix_data = make_call(f"https://api.tidal.com/v1/pages/mix", params=params, headers=headers)#, skip_cache=True)
+    mix_data = make_call("https://api.tidal.com/v1/pages/mix", params=params, headers=headers)#, skip_cache=True)
     print(mix_data)
     playlist_name = mix_data['title']
     playlist_by = 'Tidal'

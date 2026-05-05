@@ -1,18 +1,19 @@
 import json
 import os
 import re
-import requests
 import threading
 import time
 import traceback
 import uuid
-from librespot.audio.decoders import AudioQuality
+
+import requests
 from librespot.core import Session
 from librespot.zeroconf import ZeroconfServer
 from PyQt6.QtCore import QObject
-from ..otsconfig import config, cache_dir
-from ..runtimedata import get_logger, account_pool, pending, download_queue, pending_lock
-from ..utils import make_call, conv_list_format
+
+from ..otsconfig import cache_dir, config
+from ..runtimedata import account_pool, download_queue, get_logger, pending, pending_lock
+from ..utils import conv_list_format, make_call
 
 logger = get_logger("api.spotify")
 BASE_URL = "https://api.spotify.com/v1"
@@ -133,7 +134,7 @@ def spotify_new_session():
                 # I wish there was a way to get credentials without saving to
                 # a file and parsing it but not currently sure how.
                 try:
-                    with open(session_json_path, 'r') as file:
+                    with open(session_json_path) as file:
                         zeroconf_login = json.load(file)
                 except FileNotFoundError as e:
                     logger.error(f"Error: {str(e)} The file {session_json_path} was not found.\nTraceback: {traceback.format_exc()}")
@@ -174,7 +175,7 @@ def spotify_login_user(account):
             with open(session_json_path, 'w') as file:
                 json.dump(account['login'], file)
             logger.info(f"Login information for '{username[:4]}*******' written to {session_json_path}")
-        except IOError as e:
+        except OSError as e:
             logger.error(f"Error writing to file {session_json_path}: {str(e)}\nTraceback: {traceback.format_exc()}")
 
         config = Session.Configuration.Builder().set_stored_credential_file(session_json_path).build()

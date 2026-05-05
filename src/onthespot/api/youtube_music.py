@@ -1,10 +1,12 @@
-from hashlib import md5
 import json
 import os
+from hashlib import md5
+
 import requests
 from yt_dlp import YoutubeDL
+
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
+from ..runtimedata import account_pool, get_logger
 
 logger = get_logger("api.youtube_music")
 
@@ -83,7 +85,7 @@ def youtube_music_get_track_metadata(_, item_id):
 
     if os.path.isfile(req_cache_file):
         logger.debug(f'URL "{url}" cache found ! HASH: {request_key}')
-        with open(req_cache_file, 'r', encoding='utf-8') as cf:
+        with open(req_cache_file, encoding='utf-8') as cf:
             info_dict = json.load(cf)
 
     else:

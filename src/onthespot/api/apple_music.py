@@ -1,13 +1,13 @@
 import base64
-import json
-import m3u8
-from pathlib import Path
-import requests
 import re
-from uuid import uuid4
 import xml.etree.ElementTree as ET
+from uuid import uuid4
+
+import m3u8
+import requests
 from pywidevine import PSSH, Cdm, Device
 from pywidevine.license_protocol_pb2 import WidevinePsshData
+
 from ..constants import WVN_KEY
 from ..otsconfig import config
 from ..runtimedata import account_pool, get_logger

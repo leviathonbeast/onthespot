@@ -28,7 +28,7 @@ build/OnTheSpot.AppDir/AppRun -m build
 
 echo " => Prepare OnTheSpot AppImage"
 cd build/OnTheSpot.AppDir
-./AppRun -m pip install -r ../../requirements.txt
+./AppRun -m pip install .
 ./AppRun -m pip install ../../dist/onthespot-*-py3-none-any.whl
 
 rm AppRun .DirIcon python.png python*.desktop usr/share/applications/python*.desktop

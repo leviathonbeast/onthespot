@@ -13,7 +13,7 @@ source ./venv/bin/activate
 
 echo " => Upgrading pip and installing necessary dependencies..."
 venv/bin/pip install --upgrade pip wheel pyinstaller
-venv/bin/pip install -r requirements.txt
+venv/bin/pip install .
 
 
 #echo " => Build FFMPEG (Optional)"

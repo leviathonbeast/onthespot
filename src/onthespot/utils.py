@@ -2,18 +2,20 @@ import base64
 import json
 import os
 import platform
-import requests
 import ssl
 import subprocess
 from hashlib import md5
 from io import BytesIO
-from PIL import Image
-from mutagen.flac import Picture
-from mutagen.id3 import ID3, ID3NoHeaderError, WOAS, USLT, TCMP, COMM
-from mutagen.oggvorbis import OggVorbis
+
 import music_tag
+import requests
+from mutagen.flac import Picture
+from mutagen.id3 import COMM, ID3, TCMP, USLT, WOAS
+from mutagen.oggvorbis import OggVorbis
+from PIL import Image
+
 from .otsconfig import config
-from .runtimedata import get_logger, pending, download_queue
+from .runtimedata import download_queue, get_logger, pending
 
 logger = get_logger("utils")
 
@@ -36,7 +38,7 @@ def make_call(url, params=None, headers=None, session=None, skip_cache=False, te
         if os.path.isfile(req_cache_file):
             logger.debug(f'URL "{url}" cache found! HASH: {request_key}')
             try:
-                with open(req_cache_file, 'r', encoding='utf-8') as cf:
+                with open(req_cache_file, encoding='utf-8') as cf:
                     if text:
                         return cf.read()
                     json_data = json.load(cf)
@@ -262,16 +264,16 @@ def convert_video_format(item, output_path, output_format, video_files, item_met
 
         i += 1
 
-    format_map += [f'-metadata', f'title={item_metadata.get("title")}']
+    format_map += ['-metadata', f'title={item_metadata.get("title")}']
     #format_map += [f'-metadata', f'genre={item_metadata.get("genre")}']
-    format_map += [f'-metadata', f'copyright={item_metadata.get("copyright")}']
-    format_map += [f'-metadata', f'description={item_metadata.get("description")}']
+    format_map += ['-metadata', f'copyright={item_metadata.get("copyright")}']
+    format_map += ['-metadata', f'description={item_metadata.get("description")}']
     #format_map += [f'-metadata', f'year={item_metadata.get("release_year")}']
     # TV Show Specific Tags
     if item['item_type'] == 'episode':
-        format_map += [f'-metadata', f'show={item_metadata.get("show_name")}']
-        format_map += [f'-metadata', f'episode_id={item_metadata.get("episode_number")}']
-        format_map += [f'-metadata', f'tvsn={item_metadata.get("season_number")}']
+        format_map += ['-metadata', f'show={item_metadata.get("show_name")}']
+        format_map += ['-metadata', f'episode_id={item_metadata.get("episode_number")}']
+        format_map += ['-metadata', f'tvsn={item_metadata.get("season_number")}']
 
     command += format_map
 
@@ -336,9 +338,9 @@ def embed_metadata(item, metadata):
             branding = "Downloaded by OnTheSpot, https://github.com/justin025/onthespot"
             if filetype == '.mp3':
                 # Incorrectly embedded to TXXX:TCMP, patch sent upstream
-                command += ['-metadata', 'COMM={}'.format(branding)]
+                command += ['-metadata', f'COMM={branding}']
             else:
-                command += ['-metadata', 'comment={}'.format(branding)]
+                command += ['-metadata', f'comment={branding}']
 
         if config.get("embed_service_id"):
             command += ['-metadata', f'{item["item_service"]}id={item["item_id"]}']
@@ -347,107 +349,107 @@ def embed_metadata(item, metadata):
             value = metadata[key]
 
             if key == 'artists' and config.get("embed_artist"):
-                command += ['-metadata', 'artist={}'.format(value)]
+                command += ['-metadata', f'artist={value}']
 
             elif key in ['album_name', 'album'] and config.get("embed_album"):
-                command += ['-metadata', 'album={}'.format(value)]
+                command += ['-metadata', f'album={value}']
 
             elif key in ['album_artists'] and config.get("embed_albumartist"):
                 if filetype in ['.flac', '.ogg', '.opus']:
-                    command += ['-metadata', 'albumartist={}'.format(value)]
+                    command += ['-metadata', f'albumartist={value}']
                 else:
-                    command += ['-metadata', 'album_artist={}'.format(value)]
+                    command += ['-metadata', f'album_artist={value}']
 
             elif key in ['title', 'track_title', 'tracktitle'] and config.get("embed_name"):
-                command += ['-metadata', 'title={}'.format(value)]
+                command += ['-metadata', f'title={value}']
 
             elif key in ['year', 'release_year'] and config.get("embed_year"):
-                command += ['-metadata', 'date={}'.format(value)]
+                command += ['-metadata', f'date={value}']
 
             elif key in ['discnumber', 'disc_number', 'disknumber', 'disk_number'] and config.get("embed_discnumber"):
                 if filetype in ['m4a', 'mp4', 'mov']:
                     command += ['-metadata', 'disk={}/{}'.format(value, metadata['total_discs'])]
                 elif filetype in ['.flac', '.ogg', '.opus']:
-                    command += ['-metadata', 'discnumber={}'.format(value)]
+                    command += ['-metadata', f'discnumber={value}']
                     command += ['-metadata', 'disctotal={}'.format(metadata['total_discs'])]
                 else:
                     command += ['-metadata', 'disc={}/{}'.format(value, metadata['total_discs'])]
 
             elif key in ['track_number', 'tracknumber'] and config.get("embed_tracknumber"):
                 if filetype in ['.flac', '.ogg', '.opus']:
-                    command += ['-metadata', 'tracknumber={}'.format(value)]
+                    command += ['-metadata', f'tracknumber={value}']
                     command += ['-metadata', 'tracktotal={}'.format(metadata.get('total_tracks'))]
                 else:
                     command += ['-metadata', 'track={}/{}'.format(value, metadata.get('total_tracks'))]
 
             elif key == 'genre' and config.get("embed_genre"):
-                command += ['-metadata', 'genre={}'.format(value)]
+                command += ['-metadata', f'genre={value}']
 
             elif key == 'performers' and config.get("embed_performers"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TPE1={}'.format(value)]
+                    command += ['-metadata', f'TPE1={value}']
                 else:
-                    command += ['-metadata', 'performer={}'.format(value)]
+                    command += ['-metadata', f'performer={value}']
 
             elif key == 'producers' and config.get("embed_producers"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TIPL={}'.format(value)]
+                    command += ['-metadata', f'TIPL={value}']
                 else:
-                    command += ['-metadata', 'producer={}'.format(value)]
+                    command += ['-metadata', f'producer={value}']
 
             elif key == 'writers' and config.get("embed_writers"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TEXT={}'.format(value)]
+                    command += ['-metadata', f'TEXT={value}']
                 else:
-                    command += ['-metadata', 'author={}'.format(value)]
+                    command += ['-metadata', f'author={value}']
 
             elif key == 'label' and config.get("embed_label"):
                 if filetype in ['.flac', '.ogg', '.opus']:
-                    command += ['-metadata', 'label={}'.format(value)]
+                    command += ['-metadata', f'label={value}']
                 else:
-                    command += ['-metadata', 'publisher={}'.format(value)]
+                    command += ['-metadata', f'publisher={value}']
 
             elif key == 'copyright' and config.get("embed_copyright"):
-                command += ['-metadata', 'copyright={}'.format(value)]
+                command += ['-metadata', f'copyright={value}']
 
             elif key == 'description' and config.get("embed_description"):
                 if filetype == '.mp3':
                     # Incorrectly embedded to TXXX:COMM, patch sent upstream
-                    command += ['-metadata', 'COMM={}'.format(value)]
+                    command += ['-metadata', f'COMM={value}']
                 else:
-                    command += ['-metadata', 'comment={}'.format(value)]
+                    command += ['-metadata', f'comment={value}']
 
             elif key == 'language' and config.get("embed_language"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TLAN={}'.format(value)]
+                    command += ['-metadata', f'TLAN={value}']
                 else:
-                    command += ['-metadata', 'language={}'.format(value)]
+                    command += ['-metadata', f'language={value}']
 
             elif key == 'isrc' and config.get("embed_isrc"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TSRC={}'.format(value)]
+                    command += ['-metadata', f'TSRC={value}']
                 else:
-                    command += ['-metadata', 'isrc={}'.format(value)]
+                    command += ['-metadata', f'isrc={value}']
 
             elif key == 'length' and config.get("embed_length"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TLEN={}'.format(value)]
+                    command += ['-metadata', f'TLEN={value}']
                 else:
-                    command += ['-metadata', 'length={}'.format(value)]
+                    command += ['-metadata', f'length={value}']
 
             elif key == 'bpm' and config.get("embed_bpm"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TBPM={}'.format(value)]
+                    command += ['-metadata', f'TBPM={value}']
                 elif filetype in ['m4a', 'mp4', 'mov']:
-                    command += ['-metadata', 'tmpo={}'.format(value)]
+                    command += ['-metadata', f'tmpo={value}']
                 else:
-                    command += ['-metadata', 'bpm={}'.format(value)]
+                    command += ['-metadata', f'bpm={value}']
 
             elif key == 'key' and config.get("embed_key"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'TKEY={}'.format(value)]
+                    command += ['-metadata', f'TKEY={value}']
                 else:
-                    command += ['-metadata', 'initialkey={}'.format(value)]
+                    command += ['-metadata', f'initialkey={value}']
 
             elif key == 'album_type' and config.get("embed_compilation"):
                 if filetype == '.mp3':
@@ -459,52 +461,52 @@ def embed_metadata(item, metadata):
             elif key == 'item_url' and config.get("embed_url"):
                 if filetype == '.mp3':
                     # Incorrectly embedded to TXXX:WOAS, patch sent upstream
-                    command += ['-metadata', 'WOAS={}'.format(value)]
+                    command += ['-metadata', f'WOAS={value}']
                 else:
-                    command += ['-metadata', 'website={}'.format(value)]
+                    command += ['-metadata', f'website={value}']
 
             elif key == 'lyrics' and config.get("embed_lyrics"):
                 if filetype == '.mp3':
                     # Incorrectly embedded to TXXX:USLT, patch sent upstream
-                    command += ['-metadata', 'USLT={}'.format(value)]
+                    command += ['-metadata', f'USLT={value}']
                 else:
-                    command += ['-metadata', 'lyrics={}'.format(value)]
+                    command += ['-metadata', f'lyrics={value}']
 
             elif key == 'explicit' and config.get("embed_explicit"):
                 if filetype == '.mp3':
-                    command += ['-metadata', 'ITUNESADVISORY={}'.format(value)]
+                    command += ['-metadata', f'ITUNESADVISORY={value}']
                 else:
-                    command += ['-metadata', 'explicit={}'.format(value)]
+                    command += ['-metadata', f'explicit={value}']
 
             elif key == 'upc' and config.get("embed_upc"):
-                command += ['-metadata', 'upc={}'.format(value)]
+                command += ['-metadata', f'upc={value}']
 
             elif key == 'time_signature' and config.get("embed_timesignature"):
-                command += ['-metadata', 'timesignature={}'.format(value)]
+                command += ['-metadata', f'timesignature={value}']
 
             elif key == 'acousticness' and config.get("embed_acousticness"):
-                command += ['-metadata', 'acousticness={}'.format(value)]
+                command += ['-metadata', f'acousticness={value}']
 
             elif key == 'danceability' and config.get("embed_danceability"):
-                command += ['-metadata', 'danceability={}'.format(value)]
+                command += ['-metadata', f'danceability={value}']
 
             elif key == 'instrumentalness' and config.get("embed_instrumentalness"):
-                command += ['-metadata', 'instrumentalness={}'.format(value)]
+                command += ['-metadata', f'instrumentalness={value}']
 
             elif key == 'liveness' and config.get("embed_liveness"):
-                command += ['-metadata', 'liveness={}'.format(value)]
+                command += ['-metadata', f'liveness={value}']
 
             elif key == 'loudness' and config.get("embed_loudness"):
-                command += ['-metadata', 'loudness={}'.format(value)]
+                command += ['-metadata', f'loudness={value}']
 
             elif key == 'speechiness' and config.get("embed_speechiness"):
-                command += ['-metadata', 'speechiness={}'.format(value)]
+                command += ['-metadata', f'speechiness={value}']
 
             elif key == 'energy' and config.get("embed_energy"):
-                command += ['-metadata', 'energy={}'.format(value)]
+                command += ['-metadata', f'energy={value}']
 
             elif key == 'valence' and config.get("embed_valence"):
-                command += ['-metadata', 'valence={}'.format(value)]
+                command += ['-metadata', f'valence={value}']
 
         # Add output parameter at last
         command += [item['file_path']]
@@ -533,7 +535,7 @@ def set_music_thumbnail(filename, metadata):
 
         # Fetch thumbnail
         #if not os.path.isfile(image_path) or (parent_category == 'playlist' and config.get('use_playlist_path')):
-        logger.info(f"Fetching item thumbnail")
+        logger.info("Fetching item thumbnail")
         img = Image.open(BytesIO(requests.get(metadata['image_url']).content))
         buf = BytesIO()
         if img.mode != 'RGB':
@@ -626,7 +628,7 @@ def fix_mp3_metadata(filename):
         id3['WOAS'] = WOAS(url=id3['TXXX:WOAS'].text[0])
         del id3['TXXX:WOAS']
     if 'TXXX:USLT' in id3:
-        id3.add(USLT(encoding=3, lang=u'und', desc=u'desc', text=id3['TXXX:USLT'].text[0]))
+        id3.add(USLT(encoding=3, lang='und', desc='desc', text=id3['TXXX:USLT'].text[0]))
         del id3['TXXX:USLT']
     if 'TXXX:COMM' in id3:
         id3['COMM'] = COMM(encoding=3, lang='und', text=id3['TXXX:COMM'].text[0])
@@ -682,7 +684,7 @@ def add_to_m3u_file(item, item_metadata):
     ).replace(config.get('metadata_separator'), config.get('extinf_separator'))
 
     # Check if the item_path is already in the M3U file
-    with open(m3u_path, 'r', encoding='utf-8') as m3u_file:
+    with open(m3u_path, encoding='utf-8') as m3u_file:
         try:
             ext_length = round(int(item_metadata['length'])/1000)
         except Exception:

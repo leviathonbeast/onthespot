@@ -1,17 +1,9 @@
 from time import sleep
+
 from PyQt6.QtCore import QThread, pyqtSignal
-from .api.apple_music import apple_music_login_user, apple_music_get_token
-from .api.bandcamp import bandcamp_login_user
-from .api.deezer import deezer_login_user, deezer_get_token
-from .api.qobuz import qobuz_login_user, qobuz_get_token
-from .api.soundcloud import soundcloud_login_user, soundcloud_get_token
-from .api.spotify import spotify_login_user, spotify_get_token
-from .api.tidal import tidal_login_user, tidal_get_token
-from .api.youtube_music import youtube_music_login_user
-from .api.generic import generic_login_user
-from .api.crunchyroll import crunchyroll_login_user, crunchyroll_get_token
+
 from .otsconfig import config
-from .runtimedata import get_logger, account_pool
+from .runtimedata import account_pool, get_logger
 
 logger = get_logger("accounts")
 

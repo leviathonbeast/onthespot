@@ -1,19 +1,18 @@
 import base64
-from hashlib import md5
 import json
-import os
 import re
-import requests
 import time
 from uuid import uuid4
+
+import requests
 from pywidevine.cdm import Cdm
-from pywidevine.pssh import PSSH
 from pywidevine.device import Device
-from yt_dlp import YoutubeDL
+from pywidevine.pssh import PSSH
+
 from ..constants import WVN_KEY
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
-from ..utils import make_call, conv_list_format
+from ..runtimedata import account_pool, get_logger
+from ..utils import make_call
 
 logger = get_logger("api.crunchyroll")
 PUBLIC_TOKEN = "dC1rZGdwMmg4YzNqdWI4Zm4wZnE6eWZMRGZNZnJZdktYaDRKWFMxTEVJMmNDcXUxdjVXYW4="

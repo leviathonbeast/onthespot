@@ -1,6 +1,7 @@
 import os
-from PyQt6.QtGui import QIcon
+
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QWidget
+
 from ..runtimedata import download_queue, get_logger
 from ..utils import open_item
 
@@ -9,7 +10,7 @@ logger = get_logger("worker.utility")
 
 class DownloadActionsButtons(QWidget):
     def __init__(self, local_id, item_metadata, pbar, copy_btn, cancel_btn, retry_btn, open_btn, locate_btn, delete_btn, parent=None):
-        super(DownloadActionsButtons, self).__init__(parent)
+        super().__init__(parent)
         self.local_id = local_id
         self.item_metadata = item_metadata
         layout = QHBoxLayout()

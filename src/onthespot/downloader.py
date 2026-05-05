@@ -1,28 +1,40 @@
+import os
 import re
-import requests
 import subprocess
 import threading
 import time
 import traceback
-import os
-from PyQt6.QtCore import QObject, pyqtSignal
+
+import requests
 from librespot.audio.decoders import AudioQuality, VorbisOnlyAudioQuality
-from librespot.metadata import TrackId, EpisodeId
+from librespot.metadata import EpisodeId, TrackId
+from PyQt6.QtCore import QObject, pyqtSignal
 from yt_dlp import YoutubeDL
+
 from .accounts import get_account_token
-from .api.apple_music import apple_music_get_track_metadata, apple_music_get_decryption_key, apple_music_get_lyrics, apple_music_get_webplayback_info
-from .api.bandcamp import bandcamp_get_track_metadata
-from .api.deezer import deezer_get_track_metadata, get_song_info_from_deezer_website, genurlkey, calcbfkey, decryptfile
-from .api.qobuz import qobuz_get_track_metadata, qobuz_get_file_url
-from .api.soundcloud import soundcloud_get_track_metadata
-from .api.spotify import spotify_get_track_metadata, spotify_get_podcast_episode_metadata, spotify_get_lyrics
-from .api.tidal import tidal_get_track_metadata, tidal_get_lyrics, tidal_get_mpd_data
-from .api.youtube_music import youtube_music_get_track_metadata
-from .api.crunchyroll import crunchyroll_get_episode_metadata, crunchyroll_get_decryption_key, crunchyroll_get_mpd_info, crunchyroll_close_stream
-from .api.generic import generic_get_track_metadata
+from .api.apple_music import (
+    apple_music_get_decryption_key,
+    apple_music_get_webplayback_info,
+)
+from .api.crunchyroll import (
+    crunchyroll_close_stream,
+    crunchyroll_get_decryption_key,
+    crunchyroll_get_mpd_info,
+)
+from .api.deezer import calcbfkey, decryptfile, genurlkey, get_song_info_from_deezer_website
+from .api.tidal import tidal_get_mpd_data
 from .otsconfig import config
-from .runtimedata import get_logger, download_queue, download_queue_lock, account_pool, temp_download_path
-from .utils import format_item_path, convert_audio_format, embed_metadata, set_music_thumbnail, fix_mp3_metadata, add_to_m3u_file, strip_metadata, convert_video_format
+from .runtimedata import download_queue, download_queue_lock, get_logger, temp_download_path
+from .utils import (
+    add_to_m3u_file,
+    convert_audio_format,
+    convert_video_format,
+    embed_metadata,
+    fix_mp3_metadata,
+    format_item_path,
+    set_music_thumbnail,
+    strip_metadata,
+)
 
 logger = get_logger("downloader")
 

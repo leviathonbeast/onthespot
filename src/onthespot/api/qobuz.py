@@ -1,12 +1,14 @@
 import base64
-from collections import OrderedDict
 import hashlib
 import re
 import time
 import uuid
+from collections import OrderedDict
+
 import requests
+
 from ..otsconfig import config
-from ..runtimedata import get_logger, account_pool
+from ..runtimedata import account_pool, get_logger
 from ..utils import conv_list_format, make_call
 
 logger = get_logger("api.qobuz")

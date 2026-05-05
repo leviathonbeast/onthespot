@@ -1,6 +1,5 @@
-import os
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QSpinBox, QComboBox, QWidget
+from PyQt6.QtWidgets import QComboBox, QSpinBox, QWidget
+
 from ..otsconfig import config
 from ..utils import format_bytes
 

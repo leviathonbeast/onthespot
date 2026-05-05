@@ -1,29 +1,34 @@
 import os
+
 # Required for librespot-python
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+import argparse
 import curses
 import logging
 import random
 import threading
 import time
 import traceback
-import argparse
 from cmd import Cmd
+
 from .accounts import FillAccountPool, get_account_token
-from .api.apple_music import apple_music_get_track_metadata, apple_music_add_account
-from .api.bandcamp import bandcamp_get_track_metadata, bandcamp_add_account
-from .api.deezer import deezer_get_track_metadata, deezer_add_account
-from .api.qobuz import qobuz_get_track_metadata, qobuz_add_account
-from .api.soundcloud import soundcloud_get_track_metadata, soundcloud_add_account
-from .api.generic import generic_get_track_metadata, generic_add_account
-from .api.spotify import MirrorSpotifyPlayback, spotify_new_session, spotify_get_track_metadata, spotify_get_podcast_episode_metadata
-from .api.tidal import tidal_get_track_metadata, tidal_add_account_pt1, tidal_add_account_pt2
-from .api.youtube_music import youtube_music_get_track_metadata, youtube_music_add_account
-from .api.crunchyroll import crunchyroll_get_episode_metadata, crunchyroll_add_account
+from .api.apple_music import apple_music_add_account
+from .api.bandcamp import bandcamp_add_account
+from .api.crunchyroll import crunchyroll_add_account
+from .api.deezer import deezer_add_account
+from .api.generic import generic_add_account
+from .api.qobuz import qobuz_add_account
+from .api.soundcloud import soundcloud_add_account
+from .api.spotify import (
+    MirrorSpotifyPlayback,
+    spotify_new_session,
+)
+from .api.tidal import tidal_add_account_pt1, tidal_add_account_pt2
+from .api.youtube_music import youtube_music_add_account
 from .downloader import DownloadWorker, RetryWorker
-from .otsconfig import config_dir, config
-from .parse_item import parsingworker, parse_url
-from .runtimedata import account_pool, pending, download_queue, download_queue_lock, pending_lock
+from .otsconfig import config, config_dir
+from .parse_item import parse_url, parsingworker
+from .runtimedata import account_pool, download_queue, download_queue_lock, pending, pending_lock
 from .search import get_search_results
 
 if not config.get('debug_mode'):
@@ -404,13 +409,13 @@ class CLI(Cmd):
             results = get_search_results(arg)
 
             if results is True:
-                print(f"\033[32mParsing Item...\033[0m")
+                print("\033[32mParsing Item...\033[0m")
                 return
             elif results:
                 print("\033[32mSearch Results:\033[0m")
                 for index, item in enumerate(results):
                     print(f"[{index + 1}] {item['item_type']}: {item['item_name']} by {item['item_by']}")
-                print(f"[0] Exit")
+                print("[0] Exit")
                 choice = input("\033[32mEnter the number of the item you want to download: \033[0m")
                 try:
                     choice_index = int(choice) - 1
